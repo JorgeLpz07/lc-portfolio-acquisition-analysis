@@ -1,2 +1,6 @@
 
 data/*.csv
+*.zip
+*.gz
+*.rar
+*.7z
