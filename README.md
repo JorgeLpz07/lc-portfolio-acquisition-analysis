@@ -19,5 +19,19 @@ En esta fase inicial, hemos transformado los datos crudos en un dataset robusto 
 *   Aplicamos **Winsorización (Capping)** mediante la regla de 1.5x IQR para variables de escala (Ingreso Anual, Saldos Revolventes). 
 *   **Justificación:** Esto protege al modelo de distorsiones por valores extremos sin perder la información de los registros, manteniendo la estabilidad de las distribuciones.
 
+## 📊 Fase 2: Clasificación de Riesgo (PD) - ¡Completada!
+Hemos finalizado el entrenamiento del modelo de **Probabilidad de Default (PD)**, escalando el proceso a la totalidad del dataset con optimización de recursos (24GB RAM / 10-core CPU).
+### Modelo Seleccionado: **Regresión Logística (Champion)**
+Aunque se evaluaron modelos de ensamble (XGBoost, Random Forest), se seleccionó la Regresión Logística por su **transparencia regulatoria** y **estabilidad**, manteniendo un rendimiento de alto nivel.
+### Métricas de Robustez Bancaria:
+*   **Gini Coefficient: 0.455** (Supera el estándar industrial de 0.45).
+*   **ROC-AUC: 0.728**
+*   **Recall: 66%** (Detección efectiva de 2 de cada 3 potenciales morosos).
+### Impacto en el Negocio (Muestra de Validación):
+Tras auditar el modelo sobre 641,893 clientes nuevos, los resultados proyectados son:
+*   ✅ **55,267 impagos evitados** (Ahorro masivo de capital).
+*   ⚠️ **28,648 casos de riesgo residual** (Morosos que pasan los filtros, a ser analizados en la Fase 3 - LGD).
+*   🤝 **374,999 clientes aprobados correctamente**.
 ---
-*Siguiente Paso: Fase 2 - Modelado de Probabilidad de Default (PD)*
+## 🛠️ Próximos Pasos: Fase 3 - LGD
+El siguiente objetivo es predecir la **Severidad de la Pérdida (Loss Given Default)**. Utilizaremos modelos de regresión para estimar qué porcentaje del capital se recupera realmente en los 28,648 casos donde el modelo de PD falló, permitiéndonos calcular la **Pérdida Esperada (EL)** final.
