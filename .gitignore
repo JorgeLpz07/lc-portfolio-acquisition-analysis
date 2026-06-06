@@ -4,3 +4,4 @@ data/*.csv
 *.rar
 *.7z
 .ipynb_checkpoints
+*.log

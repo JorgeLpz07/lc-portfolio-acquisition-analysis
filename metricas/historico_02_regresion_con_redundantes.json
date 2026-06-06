@@ -1,0 +1,70 @@
+{
+  "metadata": {
+    "timestamp": "2026-06-06T05:48:42Z",
+    "id": "historico_02",
+    "descripcion": "Solo Regresión Logística, columnas redundantes conservadas (presentación)",
+    "porcentaje_datos": 1.0,
+    "modo_completo": false,
+    "eliminar_cols_redundantes": false,
+    "filas_total": 2139643,
+    "filas_train": 1497750,
+    "filas_test": 641893,
+    "features": 112,
+    "duracion_segundos": 195.2,
+    "notas": [
+      "flags en vars_tiempo + fillna(0)",
+      "cols_redundantes conservadas",
+      "solo Regresión Logística",
+      "sin variables leakage",
+      "titulo_empleo eliminado"
+    ]
+  },
+  "comparativa_final": [
+    {
+      "Modelo": "Regresión Logística",
+      "ROC-AUC": 0.7278556531785983,
+      "Gini": 0.4557113063571967,
+      "Recall": 0.6589763451111244
+    }
+  ],
+  "ranking_robustez": [
+    {
+      "Modelo": "Regresión Logística",
+      "Accuracy": 0.6703952216335122,
+      "Precision": 0.2320987861591928,
+      "Recall": 0.6589763451111244,
+      "F1-Score": 0.3432877979433027,
+      "ROC-AUC": 0.7278556531785983,
+      "Gini (Test)": 0.4557113063571967
+    }
+  ],
+  "metricas_detalladas": [
+    {
+      "Modelo": "Regresión Logística",
+      "Accuracy": 0.6703952216335122,
+      "Precision": 0.2320987861591928,
+      "Recall": 0.6589763451111244,
+      "F1-Score": 0.3432877979433027,
+      "ROC-AUC": 0.7278556531785983,
+      "Gini (Test)": 0.4557113063571967
+    }
+  ],
+  "modelos_gini_apto": 1,
+  "matriz_confusion_champion": {
+    "modelo": "Regresión Logística",
+    "umbral": 0.5,
+    "matriz": {
+      "TN": 375024,
+      "FP": 182954,
+      "FN": 28617,
+      "TP": 55298
+    },
+    "impacto": {
+      "clientes_buenos_detectados": 375024,
+      "morosos_evitados": 55298,
+      "morosos_escapados": 28617,
+      "buenos_rechazados_error": 182954
+    },
+    "test_size": 641893
+  }
+}
