@@ -1,7 +1,7 @@
 # Métricas del motor de riesgo — PD y LGD
 
 Detalle ampliado, históricos JSON y comparativas entre corridas.  
-**Resumen ejecutivo autocontenido:** [`../README.md`](../README.md)
+**Resumen ejecutivo:** [`../README.md`](../README.md) · **Lecciones aprendidas:** [`../README.md`](../README.md) (sección 📚)
 
 ---
 
@@ -104,8 +104,6 @@ Con redundantes conservadas, la LR **mejora ligeramente** en Accuracy, Precision
 
 **Configuración notebook (unificada con Fases 2–4):** `PORCENTAJE_DATOS = 0.1` (~214k filas) · `test_size = 0.3` · `random_state = 42`
 
-> Las cifras de población y MAE/RMSE deben **re-generarse** al ejecutar `model.ipynb` con 0.1. Una corrida documentada al 0.2 fue error de configuración y no aplica.
-
 ### Población y target
 
 | Concepto | Valor (esperado con 0.1) |
@@ -116,12 +114,14 @@ Con redundantes conservadas, la LR **mejora ligeramente** en Accuracy, Precision
 
 **Distribución típica de `LGD_Real`:** mediana < media (cola derecha); máximos históricos >100% posibles por intereses/moras acumuladas.
 
-### Pipeline de modelado
+### Pipeline de modelado (champion actual — con poda)
 
 | Paso | Decisión |
 |------|----------|
-| Predictores | 27 numéricas + 7 categóricas → 106 tras One-Hot |
-| Excluidas | `saldo_maximo_adeudado` (leakage), `LGD_Real`, `target_moroso` |
+| Morosos | 27.972 · split 70/30 · `random_state=42` |
+| Predictores | **21 numéricas + 6 categóricas** (`cat_cols_lgd`) → **90** tras One-Hot |
+| Excluidas (leakage/target) | `saldo_maximo_adeudado`, `LGD_Real`, `target_moroso` |
+| Redundantes LGD (solo Fase 3) | `tasa_interes`, 2 flags de mora NA, `num_lineas_credito_abiertas`, 2 meses mora bancaria/revolvente, `codigo_region` |
 | Escalado | `StandardScaler` solo en numéricas (`scaler_lgd`, independiente de PD) |
 | Post-proceso | Predicciones acotadas a **[0, 100]%** (criterio económico en inferencia) |
 | Target histórico | **Sin recorte** — fiel a la fórmula del enunciado |
@@ -130,13 +130,22 @@ Con redundantes conservadas, la LR **mejora ligeramente** en Accuracy, Precision
 
 | Modelo | MAE (pp) | RMSE (pp) |
 |--------|----------|-----------|
-| Baseline (predecir media train) | *pendiente 0.1* | *pendiente 0.1* |
-| **Regresión Lineal (champion)** | *pendiente 0.1* | *pendiente 0.1* |
+| Baseline (predecir media train) | 24,20 | 43,37 |
+| **Regresión Lineal (champion)** | **17,90** | **34,96** |
+| Mejora vs baseline | −6,30 | −8,41 |
 
-Corrida de referencia (solo orientativa, **0.2 erróneo**): baseline 23,74 / 42,12 · LR 17,58 / 33,71 — no usar en documentación final.
+**Comparativa poda** (mismo split):
+
+| Versión | Pre-dummies | MAE | RMSE |
+|---------|-------------|-----|------|
+| Sin poda | 27 num + 7 cat → 106 | 17,91 | 34,98 |
+| **Con poda (actual)** | **21 num + 6 cat → 90** | **17,90** | **34,96** |
+
+Corrida al 100% pendiente.
 
 - **RMSE > MAE** es patrón esperado por outliers en el target.
 - Champion: **Regresión Lineal** (explicabilidad; RF descartado aunque rinda mejor en MAE).
+- **Top coeficientes (tras poda):** `proposito_prestamo` (wedding, medical, educational), **EAD** (negativo), estados con bajo volumen.
 
 ### Validación caso a caso (test)
 
@@ -156,12 +165,13 @@ Causa: préstamos pequeños con saldo máximo muy superior al capital originado.
 
 | Pregunta | Respuesta |
 |----------|-----------|
-| ¿El modelo aporta vs adivinar la media? | Sí — MAE baja 26% (23,7 → 17,6 pp) |
+| ¿El modelo aporta vs adivinar la media? | Sí — MAE baja 26% (24,2 → 17,9 pp) |
 | ¿Hay leakage? | No — `saldo_maximo_adeudado` excluido; MAE no sospechosamente bajo |
 | ¿Por qué RMSE alto? | Outliers históricos con LGD > 100% |
-| ¿Champion? | **Regresión Lineal** — MAE/RMSE mejores que baseline, coeficientes interpretables |
-| ¿Listo para Fase 4? | Sí — `modelo_lgd_champion` + `scaler_lgd` + pipeline 106 columnas |
+| ¿Poda redundantes? | Sí — sin pérdida material de MAE/RMSE; coeficientes más legibles |
+| ¿Champion? | **Regresión Lineal** — MAE/RMSE mejores que baseline |
+| ¿Listo para Fase 4? | Sí — `modelo_lgd_champion` + `scaler_lgd` + pipeline 90 columnas |
 
 ### Variables clave guardadas para Fase 4
 
-`modelo_lgd_champion` · `scaler_lgd` · `num_cols_lgd` · `cat_cols` · columnas de `X_train_lgd`
+`modelo_lgd_champion` · `scaler_lgd` · `num_cols_lgd` · `cat_cols_lgd` · columnas de `X_train_lgd`
